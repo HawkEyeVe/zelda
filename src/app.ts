@@ -48,38 +48,41 @@ class Player {
     });
   }
 
-  moveEvent(collision: GameBoard): void {
+  moveEvent(
+    collision: GameBoard,
+    object: ObjectCreator,
+    object2: ObjectCreator
+  ): void {
     window.addEventListener("keydown", (event) => {
       switch (event.key) {
         case "ArrowUp":
           this.position.y -= 10;
-          collision.borderColision();
           this.player.applyStyles({
             top: `${this.position.y}px`,
           });
           break;
         case "ArrowDown":
           this.position.y += 10;
-          collision.borderColision();
           this.player.applyStyles({
             top: `${this.position.y}px`,
           });
           break;
         case "ArrowLeft":
           this.position.x -= 10;
-          collision.borderColision();
           this.player.applyStyles({
             left: `${this.position.x}px`,
           });
           break;
         case "ArrowRight":
           this.position.x += 10;
-          collision.borderColision();
           this.player.applyStyles({
             left: `${this.position.x}px`,
           });
           break;
       }
+      collision.borderColision();
+      object.objectColision(collision);
+      object2.objectColision(collision);
     });
   }
 }
@@ -137,9 +140,42 @@ class GameBoard {
   }
 }
 
+class ObjectCreator {
+  object: DivCreator;
+  constructor(div: DivCreator) {
+    this.object = new DivCreator("object", "div");
+    this.object.appendTo(div.div);
+    this.object.applyStyles({
+      width: "50px",
+      height: "50px",
+      background: "black",
+      position: "absolute",
+      top: `${Math.floor(Math.random() * 350)}px`,
+      left: `${Math.floor(Math.random() * 350)}px`,
+    });
+  }
+
+  objectColision(collision: GameBoard) {
+    if (
+      collision.player.position.x + 50 >=
+        parseInt(this.object.div.style.left) &&
+      collision.player.position.x <=
+        parseInt(this.object.div.style.left) + 50 &&
+      collision.player.position.y + 50 >= parseInt(this.object.div.style.top) &&
+      collision.player.position.y <= parseInt(this.object.div.style.top) + 50
+    ) {
+      collision.player.player.applyStyles({
+        background: "blue",
+      });
+    }
+  }
+}
+
 function main() {
   const game = new GameBoard();
-  game.player.moveEvent(game);
+  const object = new ObjectCreator(game.playableArea);
+  const object2 = new ObjectCreator(game.playableArea);
+  game.player.moveEvent(game, object, object2);
 }
 
 main();
