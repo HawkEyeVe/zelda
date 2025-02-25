@@ -18,6 +18,19 @@ class DivCreator {
             }
         }
     }
+    randomNumber(size) {
+        return Math.floor(Math.random() * size);
+    }
+    createBox(size, color, positionX = this.randomNumber(350), positionY = this.randomNumber(350)) {
+        this.applyStyles({
+            width: `${size}px`,
+            height: `${size}px`,
+            background: color,
+            position: "absolute",
+            top: `${positionX}px`,
+            left: `${positionY}px`,
+        });
+    }
 }
 class Player {
     player;
@@ -31,14 +44,7 @@ class Player {
         };
         this.player = new DivCreator("player", "div");
         this.player.appendTo(this.appendTo);
-        this.player.applyStyles({
-            width: "50px",
-            height: "50px",
-            background: "red",
-            position: "absolute",
-            top: `${this.position.y}px`,
-            left: `${this.position.x}px`,
-        });
+        this.player.createBox(50, "red");
     }
     moveEvent(collision, object, object2) {
         window.addEventListener("keydown", (event) => {
@@ -77,16 +83,12 @@ class Player {
 class GameBoard {
     playableArea;
     player;
+    object;
     constructor() {
         this.playableArea = new DivCreator("box", "div");
         this.playableArea.appendTo(document.body);
-        this.playableArea.applyStyles({
-            width: "400px",
-            height: "400px",
-            background: "green",
-            position: "absolute",
-            border: "20px solid black",
-        });
+        this.playableArea.createBox(400, "green", 20, 20);
+        this.object = new ObjectCreator(this.playableArea);
         this.player = new Player(this.playableArea.div);
     }
     borderColision() {
@@ -147,8 +149,6 @@ class ObjectCreator {
 }
 function main() {
     const game = new GameBoard();
-    const object = new ObjectCreator(game.playableArea);
-    const object2 = new ObjectCreator(game.playableArea);
-    game.player.moveEvent(game, object, object2);
+    game.player.moveEvent(game, game.object, game.object);
 }
 main();
